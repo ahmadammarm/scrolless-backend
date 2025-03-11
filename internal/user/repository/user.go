@@ -47,24 +47,19 @@ func (repo *userRepository) ListUser() (*userEntity.UserListResponse, error) {
 	return &userEntity.UserListResponse{Users: users}, nil
 }
 
-func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error) {
-	query := `SELECT id, name, email, password, role FROM users WHERE email = $1`
-	jwtUser := &userEntity.UserJWT{}
+func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailResponse, error) {
+    query := `SELECT id, name, email FROM users WHERE id = $1`
+    user := &userEntity.UserDetailResponse{}
 
-	err := repo.db.QueryRow(query, user.Email).Scan(&jwtUser.ID, &jwtUser.Name, &jwtUser.Email, &jwtUser.Password, &jwtUser.Role)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.New("user not found")
-		}
-		return nil, err
-	}
+    err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, errors.New("user not found")
+        }
+        return nil, err
+    }
 
-	if err := bcrypt.CompareHashAndPassword([]byte(jwtUser.Password), []byte(user.Password)); err != nil {
-		return nil, errors.New("invalid password")
-	}
-
-	return jwtUser, nil
-
+    return user, nil
 }
 
 func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
@@ -90,8 +85,35 @@ func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
 		return err
 	}
 
-	err = tx.QueryRow(query, user.Name, user.Email, hashedPassword, user.Role).Scan(&user.ID)
+	err = tx.QueryRow(query, user.Name, user.Email, hashedPassword).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
+
+    return nil
 }
+
+func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error) {
+	query := `SELECT id, name, email, password, role FROM users WHERE email = $1`
+	jwtUser := &userEntity.UserJWT{}
+
+	err := repo.db.QueryRow(query, user.Email).Scan(&jwtUser.ID, &jwtUser.Name, &jwtUser.Email, &jwtUser.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(jwtUser.Password), []byte(user.Password)); err != nil {
+		return nil, errors.New("invalid password")
+	}
+
+	return jwtUser, nil
+
+}
+
+func NewUserRepository(db *sql.DB) UserRepository {
+    return &userRepository{db}
+}
+
