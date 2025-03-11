@@ -76,7 +76,7 @@ func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
 		}
 	}()
 
-	query := `INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id`
+	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3, $4) RETURNING id`
 	user.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -94,7 +94,7 @@ func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
 }
 
 func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error) {
-	query := `SELECT id, name, email, password, role FROM users WHERE email = $1`
+	query := `SELECT id, name, email, password FROM users WHERE email = $1`
 	jwtUser := &userEntity.UserJWT{}
 
 	err := repo.db.QueryRow(query, user.Email).Scan(&jwtUser.ID, &jwtUser.Name, &jwtUser.Email, &jwtUser.Password)
