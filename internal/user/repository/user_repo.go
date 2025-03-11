@@ -48,18 +48,18 @@ func (repo *userRepository) ListUser() (*userEntity.UserListResponse, error) {
 }
 
 func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailResponse, error) {
-    query := `SELECT id, name, email FROM users WHERE id = $1`
-    user := &userEntity.UserDetailResponse{}
+	query := `SELECT id, name, email FROM users WHERE id = $1`
+	user := &userEntity.UserDetailResponse{}
 
-    err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return nil, errors.New("user not found")
-        }
-        return nil, err
-    }
+	err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
 
-    return user, nil
+	return user, nil
 }
 
 func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
@@ -90,7 +90,7 @@ func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
 		return err
 	}
 
-    return nil
+	return nil
 }
 
 func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error) {
@@ -114,6 +114,5 @@ func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.U
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {
-    return &userRepository{db}
+	return &userRepository{db}
 }
-
