@@ -15,7 +15,7 @@ type UserLogin struct {
 }
 
 type UserLogout struct {
-    Token string `json:"token" validate:"required"`
+	Token string `json:"token" validate:"required"`
 }
 
 type EditUser struct {
@@ -33,9 +33,9 @@ type UserJWT struct {
 }
 
 type UserDetailResponse struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 type UserListSubResponse struct {

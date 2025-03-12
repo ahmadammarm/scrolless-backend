@@ -58,10 +58,10 @@ func (handler *UserHandler) LogoutUser(context *fiber.Ctx) error {
 func (handler *UserHandler) ListUser(context *fiber.Ctx) error {
 	users, err := handler.userService.ListUser()
 	if err != nil {
-		return response.JSON(context, 500, "List User Failed", nil)
+		return response.JSON(context, 500, "Get List Users Failed", nil)
 	}
 
-	return response.JSON(context, 200, "List User Success", users)
+	return response.JSON(context, 200, "Get List Users Success", users)
 }
 
 func (handler *UserHandler) GetUserByID(context *fiber.Ctx) error {

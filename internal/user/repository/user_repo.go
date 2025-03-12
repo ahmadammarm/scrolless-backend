@@ -14,7 +14,18 @@ type UserRepository interface {
 	GetUserByID(userId int) (*userEntity.UserDetailResponse, error)
 	RegisterUser(user *userEntity.UserRegister) error
 	LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error)
-    LogoutUser(user *userEntity.UserLogout) error
+	LogoutUser(user *userEntity.UserLogout) error
+	IsUserExists(userId int) (bool, error)
+}
+
+func (repo *userRepository) IsUserExists(userId int) (bool, error) {
+	query := `SELECT COUNT(*) FROM users WHERE id = $1`
+	var count int
+	err := repo.db.QueryRow(query, userId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 type userRepository struct {
@@ -60,7 +71,7 @@ func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailRespo
 		return nil, err
 	}
 
-    return user, nil
+	return user, nil
 }
 
 func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
@@ -117,9 +128,10 @@ func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.U
 }
 
 func (repo *userRepository) LogoutUser(user *userEntity.UserLogout) error {
-    return nil
+	return nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {
-	return &userRepository{db}
+    return &userRepository{db}
 }
+
