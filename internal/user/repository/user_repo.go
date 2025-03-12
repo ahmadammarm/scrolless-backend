@@ -14,6 +14,7 @@ type UserRepository interface {
 	GetUserByID(userId int) (*userEntity.UserDetailResponse, error)
 	RegisterUser(user *userEntity.UserRegister) error
 	LoginUser(user *userEntity.UserLogin) (*userEntity.UserJWT, error)
+    LogoutUser(user *userEntity.UserLogout) error
 }
 
 type userRepository struct {
@@ -48,10 +49,10 @@ func (repo *userRepository) ListUser() (*userEntity.UserListResponse, error) {
 }
 
 func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailResponse, error) {
-	query := `SELECT id, name, email FROM users WHERE id = $1`
+	query := `SELECT id, name, email, password FROM users WHERE id = $1`
 	user := &userEntity.UserDetailResponse{}
 
-	err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email)
+	err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("user not found")
@@ -59,7 +60,7 @@ func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailRespo
 		return nil, err
 	}
 
-	return user, nil
+    return user, nil
 }
 
 func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
@@ -69,23 +70,25 @@ func (repo *userRepository) RegisterUser(user *userEntity.UserRegister) error {
 	}
 
 	defer func() {
-		if err != nil {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
 			tx.Rollback()
 		} else {
 			tx.Commit()
 		}
 	}()
 
-	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3, $4) RETURNING id`
-	user.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+	query := `INSERT INTO users (name, email, password, created_at) VALUES ($1, $2, $3, $4) RETURNING id`
+	user.CreatedAt = time.Now().Unix()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-
 	if err != nil {
 		return err
 	}
 
-	err = tx.QueryRow(query, user.Name, user.Email, hashedPassword).Scan(&user.ID)
+	err = tx.QueryRow(query, user.Name, user.Email, hashedPassword, user.CreatedAt).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
@@ -111,6 +114,10 @@ func (repo *userRepository) LoginUser(user *userEntity.UserLogin) (*userEntity.U
 
 	return jwtUser, nil
 
+}
+
+func (repo *userRepository) LogoutUser(user *userEntity.UserLogout) error {
+    return nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

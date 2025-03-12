@@ -11,12 +11,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type userHandler struct {
+type UserHandler struct {
 	userService userService.UserService
 	validation  *validator.Validate
 }
 
-func (handler *userHandler) RegisterUser(context *fiber.Ctx) error {
+func (handler *UserHandler) RegisterUser(context *fiber.Ctx) error {
 	user := new(entity.UserRegister)
 	if err := context.BodyParser(user); err != nil {
 		return response.JSON(context, 400, "Invalid Request", nil)
@@ -34,7 +34,7 @@ func (handler *userHandler) RegisterUser(context *fiber.Ctx) error {
 	return response.JSON(context, 200, "Register User Success", nil)
 }
 
-func (handler *userHandler) LoginUser(context *fiber.Ctx) error {
+func (handler *UserHandler) LoginUser(context *fiber.Ctx) error {
 
 	loginReq := new(entity.UserLogin)
 
@@ -51,7 +51,11 @@ func (handler *userHandler) LoginUser(context *fiber.Ctx) error {
 	return response.JSON(context, 200, "Login User Success", token)
 }
 
-func (handler *userHandler) ListUser(context *fiber.Ctx) error {
+func (handler *UserHandler) LogoutUser(context *fiber.Ctx) error {
+    return response.JSON(context, 200, "Logout User Success", nil)
+}
+
+func (handler *UserHandler) ListUser(context *fiber.Ctx) error {
 	users, err := handler.userService.ListUser()
 	if err != nil {
 		return response.JSON(context, 500, "List User Failed", nil)
@@ -60,7 +64,7 @@ func (handler *userHandler) ListUser(context *fiber.Ctx) error {
 	return response.JSON(context, 200, "List User Success", users)
 }
 
-func (handler *userHandler) GetUserByID(context *fiber.Ctx) error {
+func (handler *UserHandler) GetUserByID(context *fiber.Ctx) error {
 	userIdString := context.Params("id")
 	userId, err := strconv.Atoi(userIdString)
 
@@ -76,15 +80,16 @@ func (handler *userHandler) GetUserByID(context *fiber.Ctx) error {
 	return response.JSON(context, 200, "Get User Success", user)
 }
 
-func (handler *userHandler) Router(router fiber.Router) {
+func (handler *UserHandler) Router(router fiber.Router) {
 	router.Post("/user/register", handler.RegisterUser)
 	router.Post("/user/login", handler.LoginUser)
+    router.Post("/user/logout", handler.LogoutUser)
 	router.Get("/users", handler.ListUser)
 	router.Get("/user/:id", handler.GetUserByID)
 }
 
-func NewUserHandler(userService userService.UserService, validation *validator.Validate) *userHandler {
-	return &userHandler{
+func NewUserHandler(userService userService.UserService, validation *validator.Validate) *UserHandler {
+	return &UserHandler{
 		userService: userService,
 		validation:  validation,
 	}

@@ -69,6 +69,10 @@ func (service *userService) LoginUser(user *userEntity.UserLogin) (string, error
 
 }
 
+func (service *userService) LogoutUser(user *userEntity.UserLogout) error {
+    return service.userRepo.LogoutUser(user)
+}
+
 func NewUserService(userRepo userRepo.UserRepository) UserService {
 	return &userService{
 		userRepo: userRepo,
