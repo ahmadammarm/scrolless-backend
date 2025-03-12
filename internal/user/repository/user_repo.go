@@ -49,10 +49,10 @@ func (repo *userRepository) ListUser() (*userEntity.UserListResponse, error) {
 }
 
 func (repo *userRepository) GetUserByID(userId int) (*userEntity.UserDetailResponse, error) {
-	query := `SELECT id, name, email, password FROM users WHERE id = $1`
+	query := `SELECT id, name, email FROM users WHERE id = $1`
 	user := &userEntity.UserDetailResponse{}
 
-	err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	err := repo.db.QueryRow(query, userId).Scan(&user.ID, &user.Name, &user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("user not found")
