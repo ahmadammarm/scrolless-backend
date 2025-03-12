@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ahmadammarm/scrolless-backend/package/response"
+	"github.com/ahmadammarm/scrolless-backend/utils/response"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
