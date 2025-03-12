@@ -31,15 +31,15 @@ func NewTrackedAppService(trackedAppRepo trackedAppRepo.TrackedAppRepository, us
 func (service *trackedAppService) ListTrackedApp(userID int) (*entity.TrackedAppsListResponse, error) {
 	userExists, err := service.userRepo.IsUserExists(userID)
 	if err != nil {
-		return nil, fmt.Errorf("gagal memeriksa user: %w", err)
+		return nil, fmt.Errorf("failed to check user: %w", err)
 	}
 	if !userExists {
-		return nil, errors.New("user tidak ditemukan atau belum login")
+		return nil, errors.New("user not found or not logged in")
 	}
 
 	apps, err := service.trackedAppRepo.ListTrackedApp()
 	if err != nil {
-		return nil, fmt.Errorf("gagal mengambil daftar aplikasi: %w", err)
+		return nil, fmt.Errorf("failed to get tracked apps: %w", err)
 	}
 
 	filteredApps := []entity.TrackedApps{}
@@ -55,11 +55,11 @@ func (service *trackedAppService) ListTrackedApp(userID int) (*entity.TrackedApp
 func (service *trackedAppService) GetTrackedAppByID(userID, trackedAppID int) (*entity.TrackedAppsResponse, error) {
 	app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
 	if err != nil {
-		return nil, fmt.Errorf("gagal mengambil aplikasi: %w", err)
+		return nil, fmt.Errorf("failed to get tracked app: %w", err)
 	}
 
 	if app.UserID != userID {
-		return nil, errors.New("akses ditolak: aplikasi tidak dimiliki oleh user")
+		return nil, errors.New("access denied: app is not owned by user")
 	}
 
 	return app, nil
@@ -68,17 +68,17 @@ func (service *trackedAppService) GetTrackedAppByID(userID, trackedAppID int) (*
 func (service *trackedAppService) CreateTrackedApp(userID int, trackedApp *entity.TrackedAppsRequest) error {
 	userExists, err := service.userRepo.IsUserExists(userID)
 	if err != nil {
-		return fmt.Errorf("gagal memeriksa user: %w", err)
+		return fmt.Errorf("failed to check user: %w", err)
 	}
 	if !userExists {
-		return errors.New("user tidak ditemukan atau belum login")
+		return errors.New("user not found or not logged in")
 	}
 
 	trackedApp.UserID = userID
 
 	err = service.trackedAppRepo.CreateTrackedApp(trackedApp)
 	if err != nil {
-		return fmt.Errorf("gagal menambahkan aplikasi: %w", err)
+		return fmt.Errorf("failed to create tracked app: %w", err)
 	}
 	return nil
 }
@@ -86,15 +86,15 @@ func (service *trackedAppService) CreateTrackedApp(userID int, trackedApp *entit
 func (service *trackedAppService) DeleteTrackedApp(userID, trackedAppID int) error {
 	app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
 	if err != nil {
-		return fmt.Errorf("gagal mengambil aplikasi: %w", err)
+		return fmt.Errorf("failed to get tracked app: %w", err)
 	}
 	if app.UserID != userID {
-		return errors.New("akses ditolak: aplikasi tidak dimiliki oleh user")
+		return errors.New("access denied: app is not owned by user")
 	}
 
 	err = service.trackedAppRepo.DeleteTrackedApp(trackedAppID)
 	if err != nil {
-		return fmt.Errorf("gagal menghapus aplikasi: %w", err)
+		return fmt.Errorf("failed to delete tracked app: %w", err)
 	}
 	return nil
 }
