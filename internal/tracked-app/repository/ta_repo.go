@@ -2,6 +2,8 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
+	"time"
 
 	"github.com/ahmadammarm/scrolless-backend/internal/tracked-app/entity"
 )
@@ -50,21 +52,27 @@ func (repo *trackedAppRepository) GetTrackedAppByID(trackedAppId int) (*entity.T
 
 	err := repo.db.QueryRow(query, trackedAppId).Scan(&app.ID, &app.UserID, &app.AppName, &app.Status)
 	if err != nil {
-		return nil, err
-	}
+        if err == sql.ErrNoRows {
+            return nil, errors.New("tracked app not found")
+        }
+    }
 
 	return app, nil
 }
 
 func (repo *trackedAppRepository) CreateTrackedApp(trackedApp *entity.TrackedAppsRequest) error {
-	query := `INSERT INTO tracked_apps (user_id, app_name, status) VALUES ($1, $2, true)`
-	_, err := repo.db.Exec(query, trackedApp.UserID, trackedApp.AppName, trackedApp.Status)
-	if err != nil {
-		return err
-	}
+    query := `INSERT INTO tracked_apps (user_id, app_name, status, created_at) VALUES ($1, $2, $3, $4) RETURNING id`
 
-	return nil
+    trackedApp.CreatedAt = time.Now().Unix()
+
+    err := repo.db.QueryRow(query, trackedApp.UserID, trackedApp.AppName, trackedApp.Status, trackedApp.CreatedAt).Scan(&trackedApp.ID)
+    if err != nil {
+        return err
+    }
+
+    return nil
 }
+
 
 func (repo *trackedAppRepository) DeleteTrackedApp(trackedAppId int) error {
 	query := `DELETE FROM tracked_apps WHERE id = $1`

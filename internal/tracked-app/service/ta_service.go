@@ -21,13 +21,6 @@ type trackedAppService struct {
 	userRepo       userRepo.UserRepository
 }
 
-func NewTrackedAppService(trackedAppRepo trackedAppRepo.TrackedAppRepository, userRepo userRepo.UserRepository) TrackedAppService {
-	return &trackedAppService{
-		trackedAppRepo: trackedAppRepo,
-		userRepo:       userRepo,
-	}
-}
-
 func (service *trackedAppService) ListTrackedApp(userID int) (*entity.TrackedAppsListResponse, error) {
 	userExists, err := service.userRepo.IsUserExists(userID)
 	if err != nil {
@@ -53,48 +46,68 @@ func (service *trackedAppService) ListTrackedApp(userID int) (*entity.TrackedApp
 }
 
 func (service *trackedAppService) GetTrackedAppByID(userID, trackedAppID int) (*entity.TrackedAppsResponse, error) {
-	app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get tracked app: %w", err)
-	}
+	userExists, err := service.userRepo.IsUserExists(userID)
+    if err != nil {
+        return nil, fmt.Errorf("failed to check user: %w", err)
+    }
 
-	if app.UserID != userID {
-		return nil, errors.New("access denied: app is not owned by user")
-	}
+    if !userExists {
+        return nil, errors.New("user not found or not logged in")
+    }
 
-	return app, nil
+    app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
+
+    if err != nil {
+        return nil, fmt.Errorf("failed to get tracked app: %w", err)
+    }
+
+    if app.UserID != userID {
+        return nil, errors.New("access denied: app is not owned by user")
+    }
+
+    return app, nil
 }
 
 func (service *trackedAppService) CreateTrackedApp(userID int, trackedApp *entity.TrackedAppsRequest) error {
-	userExists, err := service.userRepo.IsUserExists(userID)
-	if err != nil {
-		return fmt.Errorf("failed to check user: %w", err)
-	}
-	if !userExists {
-		return errors.New("user not found or not logged in")
-	}
+    userExists, err := service.userRepo.IsUserExists(userID)
+    if err != nil {
+        return fmt.Errorf("failed to check user: %w", err)
+    }
+    if !userExists {
+        return errors.New("user not found or not logged in")
+    }
 
-	trackedApp.UserID = userID
-
-	err = service.trackedAppRepo.CreateTrackedApp(trackedApp)
-	if err != nil {
-		return fmt.Errorf("failed to create tracked app: %w", err)
-	}
-	return nil
+    trackedApp.UserID = userID
+    err = service.trackedAppRepo.CreateTrackedApp(trackedApp)
+    if err != nil {
+        return fmt.Errorf("failed to create tracked app: %w", err)
+    }
+    return nil
 }
 
 func (service *trackedAppService) DeleteTrackedApp(userID, trackedAppID int) error {
-	app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
-	if err != nil {
-		return fmt.Errorf("failed to get tracked app: %w", err)
-	}
-	if app.UserID != userID {
-		return errors.New("access denied: app is not owned by user")
-	}
+	userExists, err := service.userRepo.IsUserExists(userID)
+    if err != nil {
+        return fmt.Errorf("failed to check user: %w", err)
+    }
 
-	err = service.trackedAppRepo.DeleteTrackedApp(trackedAppID)
-	if err != nil {
-		return fmt.Errorf("failed to delete tracked app: %w", err)
-	}
-	return nil
+    if !userExists {
+        return errors.New("user not found or not logged in")
+    }
+
+    app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
+
+    if err != nil {
+        return fmt.Errorf("failed to get tracked app: %w", err)
+    }
+
+    if app.UserID != userID {
+        return errors.New("access denied: app is not owned by user")
+    }
+
+    return service.trackedAppRepo.DeleteTrackedApp(trackedAppID)
+}
+
+func NewTrackedAppService(trackedAppRepo trackedAppRepo.TrackedAppRepository, userRepo userRepo.UserRepository) TrackedAppService {
+    return &trackedAppService{trackedAppRepo: trackedAppRepo, userRepo: userRepo}
 }
