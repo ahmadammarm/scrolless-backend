@@ -9,10 +9,12 @@ import (
 )
 
 type TrackedAppRepository interface {
+	CreateTrackedApp(trackedApp *entity.TrackedAppsRequest) error
 	ListTrackedApp() (*entity.TrackedAppsListResponse, error)
 	GetTrackedAppByID(trackedAppId int) (*entity.TrackedAppsResponse, error)
-	CreateTrackedApp(trackedApp *entity.TrackedAppsRequest) error
 	DeleteTrackedApp(trackedAppId int) error
+	ActivateTrackedApp(trackedAppId int) error
+    DeactivateTrackedApp(trackedAppId int) error
 }
 
 type trackedAppRepository struct {
@@ -60,12 +62,13 @@ func (repo *trackedAppRepository) GetTrackedAppByID(trackedAppId int) (*entity.T
 	return app, nil
 }
 
+
 func (repo *trackedAppRepository) CreateTrackedApp(trackedApp *entity.TrackedAppsRequest) error {
-    query := `INSERT INTO tracked_apps (user_id, app_name, status, created_at) VALUES ($1, $2, $3, $4) RETURNING id`
+    query := `INSERT INTO tracked_apps (user_id, app_name, status, duration, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
     trackedApp.CreatedAt = time.Now().Unix()
 
-    err := repo.db.QueryRow(query, trackedApp.UserID, trackedApp.AppName, trackedApp.Status, trackedApp.CreatedAt).Scan(&trackedApp.ID)
+    err := repo.db.QueryRow(query, trackedApp.UserID, trackedApp.AppName, trackedApp.Status, trackedApp.CreatedAt, trackedApp.Duration).Scan(&trackedApp.ID)
     if err != nil {
         return err
     }
@@ -84,6 +87,25 @@ func (repo *trackedAppRepository) DeleteTrackedApp(trackedAppId int) error {
 	return nil
 }
 
+func (repo *trackedAppRepository) ActivateTrackedApp(trackedAppId int) error {
+    query := `UPDATE tracked_apps SET status = true, duration = $1, end_time = $2 WHERE id = $3`
+    _, err := repo.db.Exec(query, trackedAppId)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (repo *trackedAppRepository) DeactivateTrackedApp(trackedAppId int) error {
+    query := `UPDATE tracked_apps SET status = false, duration = 0, end_time = 0 WHERE id = $1`
+    _, err := repo.db.Exec(query, trackedAppId)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
 func NewTrackedAppRepository(db *sql.DB) TrackedAppRepository {
-	return &trackedAppRepository{db: db}
+    return &trackedAppRepository{db}
 }
