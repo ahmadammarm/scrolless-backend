@@ -47,10 +47,10 @@ func (repo *trackedAppRepository) ListTrackedApp() (*entity.TrackedAppsListRespo
 }
 
 func (repo *trackedAppRepository) GetTrackedAppByID(trackedAppId int) (*entity.TrackedAppsResponse, error) {
-	query := `SELECT id, user_id, app_name, status FROM tracked_apps WHERE id = $1`
+	query := `SELECT id, user_id, app_name, status, created_at FROM tracked_apps WHERE id = $1`
 	app := &entity.TrackedAppsResponse{}
 
-	err := repo.db.QueryRow(query, trackedAppId).Scan(&app.ID, &app.UserID, &app.AppName, &app.Status)
+	err := repo.db.QueryRow(query, trackedAppId).Scan(&app.ID, &app.UserID, &app.AppName, &app.Status, &app.CreatedAt)
 	if err != nil {
         if err == sql.ErrNoRows {
             return nil, errors.New("tracked app not found")

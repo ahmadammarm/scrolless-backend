@@ -21,6 +21,7 @@ type TrackedAppsResponse struct {
 	UserID    int    `json:"user_id"`
 	AppName   string `json:"app_name"`
 	Status    bool   `json:"status" default:"false"`
+    CreatedAt int64  `json:"created_at"`
 }
 
 type TrackedAppsListResponse struct {
