@@ -35,24 +35,23 @@ func (handler *TrackedAppHandler) ListTrackedApp(context *fiber.Ctx) error {
 
 
 func (handler *TrackedAppHandler) GetTrackedAppByID(context *fiber.Ctx) error {
-	userId, ok := context.Locals("user_id").(int)
+    userId, ok := context.Locals("user_id").(int)
     if !ok {
         return response.JSON(context, 401, "Unauthorized", nil)
     }
 
     trackedAppId, err := strconv.Atoi(context.Params("id"))
-
     if err != nil {
         return response.JSON(context, 400, "Invalid Request", nil)
     }
 
-    app, err := handler.trackedAppService.GetTrackedAppByID(userId, trackedAppId)
+    trackedApp, err := handler.trackedAppService.GetTrackedAppByID(userId, trackedAppId)
 
     if err != nil {
         return response.JSON(context, 500, "Get Tracked App Failed", nil)
     }
 
-    return response.JSON(context, 200, "Get Tracked App Success", app)
+    return response.JSON(context, 200, "Get Tracked App Success", trackedApp)
 }
 
 func (handler *TrackedAppHandler) CreateTrackedApp(context *fiber.Ctx) error {

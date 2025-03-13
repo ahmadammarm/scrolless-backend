@@ -50,13 +50,11 @@ func (service *trackedAppService) GetTrackedAppByID(userID, trackedAppID int) (*
     if err != nil {
         return nil, fmt.Errorf("failed to check user: %w", err)
     }
-
     if !userExists {
         return nil, errors.New("user not found or not logged in")
     }
 
     app, err := service.trackedAppRepo.GetTrackedAppByID(trackedAppID)
-
     if err != nil {
         return nil, fmt.Errorf("failed to get tracked app: %w", err)
     }

@@ -18,18 +18,19 @@ type UserRepository interface {
 	IsUserExists(userId int) (bool, error)
 }
 
-func (repo *userRepository) IsUserExists(userId int) (bool, error) {
-	query := `SELECT COUNT(*) FROM users WHERE id = $1`
-	var count int
-	err := repo.db.QueryRow(query, userId).Scan(&count)
-	if err != nil {
-		return false, err
-	}
-	return count > 0, nil
-}
 
 type userRepository struct {
-	db *sql.DB
+    db *sql.DB
+}
+
+func (repo *userRepository) IsUserExists(userId int) (bool, error) {
+    query := `SELECT COUNT(*) FROM users WHERE id = $1`
+    var count int
+    err := repo.db.QueryRow(query, userId).Scan(&count)
+    if err != nil {
+        return false, err
+    }
+    return count > 0, nil
 }
 
 func (repo *userRepository) ListUser() (*userEntity.UserListResponse, error) {
