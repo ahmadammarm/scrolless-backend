@@ -1,22 +1,27 @@
 package entity
 
+type ChallengeStatus string
+
+const (
+	StatusSudah ChallengeStatus = "sudah"
+	StatusBelum ChallengeStatus = "belum"
+)
+
 type Challenge struct {
-	Title       string `json:"title" validate:"required"`
-	UserID      int    `json:"user_id" validate:"required"`
-	Description string `json:"description" validate:"required"`
-	Category    string `json:"category" validate:"required"`
-	Difficulty  string `json:"difficulty" validate:"required"`
-	Points      int    `json:"points" validate:"required"`
+	ID          int             `json:"id"`
+	Title       string          `json:"title" validate:"required"`
+	UserID      int             `json:"user_id" validate:"required"`
+	Description string          `json:"description" validate:"required"`
+	Status      ChallengeStatus `json:"status" validate:"oneof=sudah belum" default:"belum"`
+	Points      int             `json:"points" default:"0"`
 }
 
 type ChallengeResponse struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	UserID      int    `json:"user_id"`
-	Description string `json:"description"`
-	Category    string `json:"category"`
-	Difficulty  string `json:"difficulty"`
-	Points      int    `json:"points"`
+	ID          int             `json:"id"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Status      ChallengeStatus `json:"status"`
+	Points      int             `json:"points"`
 }
 
 type ChallengeListResponse struct {
