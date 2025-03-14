@@ -11,12 +11,12 @@ type TrackedApps struct {
 }
 
 type TrackedAppsRequest struct {
-	ID       int    `json:"id"`
-	UserID   int    `json:"user_id"`
-	AppName  string `json:"app_name"`
-	Status   bool   `json:"status" default:"false"`
-	Duration int    `json:"duration"`
-    CreatedAt int64  `json:"created_at"`
+	ID        int    `json:"id"`
+	UserID    int    `json:"user_id"`
+	AppName   string `json:"app_name"`
+	Status    bool   `json:"status" default:"false"`
+	Duration  int    `json:"duration"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 type TrackedAppsResponse struct {
