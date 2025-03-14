@@ -20,8 +20,8 @@ type challengeRepository struct {
 }
 
 func (repo *challengeRepository) CreateChallenge(challenge *entity.Challenge) error {
-	query := `INSERT INTO challenges (title, user_id, description, status) VALUES ($1, $2, $3, $4, $5)`
-	_, err := repo.db.Exec(query, challenge.Title, challenge.UserID, challenge.Description, challenge.Status)
+	query := `INSERT INTO challenges (title, user_id, description) VALUES ($1, $2, $3)`
+	_, err := repo.db.Exec(query, challenge.Title, challenge.UserID, challenge.Description)
 	if err != nil {
 		return err
 	}

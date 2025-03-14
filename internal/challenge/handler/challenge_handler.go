@@ -107,7 +107,7 @@ func (handler *ChallengeHandler) DeleteChallenge(context *fiber.Ctx) error {
 
 func (handler *ChallengeHandler) Router(router fiber.Router) {
 	router.Post("/challenge", handler.CreateChallenge)
-	router.Get("/challenge", handler.ListChallenge)
+	router.Get("/challenges", handler.ListChallenge)
 	router.Get("/challenge/:id", handler.GetChallengeByID)
 	router.Delete("/challenge/:id", handler.DeleteChallenge)
 	router.Post("/challenge/:id/done", handler.AddPointsByChallengeDone)
