@@ -79,7 +79,6 @@ func (repo *challengeRepository) GetChallengeByID(challengeID int) (*entity.Chal
 	return challenge, nil
 }
 
-
 func (repo *challengeRepository) DeleteChallenge(challengeID int) error {
 	query := `DELETE FROM challenges WHERE id = $1`
 	_, err := repo.db.Exec(query, challengeID)

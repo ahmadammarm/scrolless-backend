@@ -109,13 +109,13 @@ func (handler *ChallengeHandler) Router(router fiber.Router) {
 	router.Post("/challenge", handler.CreateChallenge)
 	router.Get("/challenges", handler.ListChallenge)
 	router.Get("/challenge/:id", handler.GetChallengeByID)
-	router.Delete("/challenge/:id", handler.DeleteChallenge)
 	router.Post("/challenge/:id/done", handler.AddPointsByChallengeDone)
+	router.Delete("/challenge/:id", handler.DeleteChallenge)
 }
 
 func NewChallengeHandler(challengeService challengeService.ChallengeService, validator *validator.Validate) *ChallengeHandler {
-    return &ChallengeHandler{
-        challengeService: challengeService,
-        validation:       validator,
-    }
+	return &ChallengeHandler{
+		challengeService: challengeService,
+		validation:       validator,
+	}
 }

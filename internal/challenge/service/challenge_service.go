@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-
 	"github.com/ahmadammarm/scrolless-backend/internal/challenge/entity"
 	challengeRepo "github.com/ahmadammarm/scrolless-backend/internal/challenge/repository"
 	userRepo "github.com/ahmadammarm/scrolless-backend/internal/user/repository"
