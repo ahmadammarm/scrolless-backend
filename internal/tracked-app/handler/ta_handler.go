@@ -95,55 +95,54 @@ func (handler *TrackedAppHandler) DeleteTrackedApp(context *fiber.Ctx) error {
 }
 
 func (handler *TrackedAppHandler) ActivateTrackedApp(context *fiber.Ctx) error {
-    userId, ok := context.Locals("user_id").(int)
-    if !ok {
-        return response.JSON(context, 401, "Unauthorized", nil)
-    }
+	userId, ok := context.Locals("user_id").(int)
+	if !ok {
+		return response.JSON(context, 401, "Unauthorized", nil)
+	}
 
-    trackedAppId, err := strconv.Atoi(context.Params("id"))
+	trackedAppId, err := strconv.Atoi(context.Params("id"))
 
-    if err != nil {
-        return response.JSON(context, 400, "Invalid Request", nil)
-    }
+	if err != nil {
+		return response.JSON(context, 400, "Invalid Request", nil)
+	}
 
-    err = handler.trackedAppService.ActivateTrackedApp(userId, trackedAppId)
-    if err != nil {
-        return response.JSON(context, 500, "Activate Tracked App Failed", nil)
-    }
+	err = handler.trackedAppService.ActivateTrackedApp(userId, trackedAppId)
+	if err != nil {
+		return response.JSON(context, 500, "Activate Tracked App Failed", nil)
+	}
 
-    return response.JSON(context, 200, "Activate Tracked App Success", nil)
+	return response.JSON(context, 200, "Activate Tracked App Success", nil)
 }
 
 func (handler *TrackedAppHandler) DeactivateTrackedApp(context *fiber.Ctx) error {
-    userId, ok := context.Locals("user_id").(int)
-    if !ok {
-        return response.JSON(context, 401, "Unauthorized", nil)
-    }
+	userId, ok := context.Locals("user_id").(int)
+	if !ok {
+		return response.JSON(context, 401, "Unauthorized", nil)
+	}
 
-    trackedAppId, err := strconv.Atoi(context.Params("id"))
+	trackedAppId, err := strconv.Atoi(context.Params("id"))
 
-    if err != nil {
-        return response.JSON(context, 400, "Invalid Request", nil)
-    }
+	if err != nil {
+		return response.JSON(context, 400, "Invalid Request", nil)
+	}
 
-    err = handler.trackedAppService.DeactivateTrackedApp(userId, trackedAppId)
-    if err != nil {
-        return response.JSON(context, 500, "Deactivate Tracked App Failed", nil)
-    }
+	err = handler.trackedAppService.DeactivateTrackedApp(userId, trackedAppId)
+	if err != nil {
+		return response.JSON(context, 500, "Deactivate Tracked App Failed", nil)
+	}
 
-    return response.JSON(context, 200, "Deactivate Tracked App Success", nil)
+	return response.JSON(context, 200, "Deactivate Tracked App Success", nil)
 }
 
 func (handler *TrackedAppHandler) Router(router fiber.Router) {
-    router.Use(middleware.ProtectedJWT())
-    router.Get("/tracked-apps", handler.ListTrackedApp)
-    router.Get("/tracked-apps/:id", handler.GetTrackedAppByID)
-    router.Post("/tracked-apps", handler.CreateTrackedApp)
-    router.Delete("/tracked-apps/:id", handler.DeleteTrackedApp)
-    router.Post("/tracked-apps/:id/activate", handler.ActivateTrackedApp)
-    router.Post("/tracked-apps/:id/deactivate", handler.DeactivateTrackedApp)
+	router.Use(middleware.ProtectedJWT())
+	router.Get("/tracked-apps", handler.ListTrackedApp)
+	router.Get("/tracked-apps/:id", handler.GetTrackedAppByID)
+	router.Post("/tracked-apps", handler.CreateTrackedApp)
+	router.Delete("/tracked-apps/:id", handler.DeleteTrackedApp)
+	router.Post("/tracked-apps/:id/activate", handler.ActivateTrackedApp)
+	router.Post("/tracked-apps/:id/deactivate", handler.DeactivateTrackedApp)
 }
-
 
 func NewTrackedAppHandler(trackedAppService trackedAppService.TrackedAppService, validator *validator.Validate) *TrackedAppHandler {
 	return &TrackedAppHandler{
